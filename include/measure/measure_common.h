@@ -4,7 +4,17 @@
 #include "util.h"
 
 bool __always_inline common_is_in_cache(uint64_t result, measure_metadata params) {
+    //if (params.threshold == 180){
+    
+    
+    printf("  %ld\n", result);
     return result < params.threshold;
+    //result = result - 40;
+    //return result > params.threshold;
+    //} else {
+    //	printf("  %ld\n", result);
+    //	return 40 < result < params.threshold;
+    //}
 }
 
 uint64_t __always_inline common_probe_once(node *set, uintptr_t candidate, measure_metadata params) {

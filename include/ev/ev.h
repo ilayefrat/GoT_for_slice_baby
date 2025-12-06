@@ -12,4 +12,6 @@ typedef struct {
 
 bool populate_eviction_set(eviction_set *llc_eviction_set, uintptr_t evictee);
 bool populate_eviction_set_l2(eviction_set *l2_eviction_set, uintptr_t evictee);
+bool populate_eviction_set_l2_cheat(eviction_set *l2_eviction_set, uintptr_t evictee);
+bool l2_cheat(uintptr_t evicter, uintptr_t evictee);
 eviction_set *find_eviction_sets(int amount);

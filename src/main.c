@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//#include <signal.h>
 #include "experiments.h"
 
 int main(int argc, char *argv[]) {
@@ -19,5 +20,7 @@ int main(int argc, char *argv[]) {
         experiment_descriptor current = experiments[i];
         printf("%*s\t\t%s\n\n", 30, current.experiment_name, current.description);
     }
+    //sleep(1000000);
+    //raise(SIGSTOP);
     return 0;
-}
+}  

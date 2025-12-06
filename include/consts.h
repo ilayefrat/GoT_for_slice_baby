@@ -9,7 +9,7 @@
 #define CACHE_LINE_SIZE (64)
 #define DOUBLE_CACHE_LINE_SIZE (128)
 #define L2_CACHE_SIZE (256*1024)
-#define L2_CACHE_ASSOCIATIVITY (4)
+#define L2_CACHE_ASSOCIATIVITY (4) //12 if we include l1data
 
 // ASCII colors
 //Regular text

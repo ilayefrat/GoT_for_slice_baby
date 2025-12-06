@@ -74,7 +74,11 @@ const int cache_sets = LLC_CACHE_SIZE / CACHE_LINE_SIZE / CACHE_ASSOCIATIVITY / 
 uint64_t physical_to_cacheset(uint64_t paddr) {
     return (paddr >> CACHE_LINE_BITS) & (cache_sets - 1);
 }
+const int cache_sets2 = L2_CACHE_SIZE / CACHE_LINE_SIZE / L2_CACHE_ASSOCIATIVITY;
 
+uint64_t physical_to_cacheset2(uint64_t paddr) {
+    return (paddr >> CACHE_LINE_BITS) & (cache_sets2 - 1);
+}
 cache_bucket to_cache_bucket(uint64_t vaddr) {
     uint64_t paddr = virt_to_physical(vaddr);
     return (cache_bucket){physical_to_cacheset(paddr), physical_to_slice(paddr)};
@@ -82,6 +86,15 @@ cache_bucket to_cache_bucket(uint64_t vaddr) {
 
 void print_cache_bucket(uint64_t vaddr) {
     cache_bucket bucket = to_cache_bucket(vaddr);
+    printf("(%d, %d)\n", bucket.cache_set, bucket.slice);
+}
+cache_bucket to_cache_bucket2(uint64_t vaddr) {
+    uint64_t paddr = virt_to_physical(vaddr);
+    return (cache_bucket){physical_to_cacheset2(paddr), physical_to_slice(paddr)};
+}
+
+void print_cache_bucket2(uint64_t vaddr) {
+    cache_bucket bucket = to_cache_bucket2(vaddr);
     printf("(%d, %d)\n", bucket.cache_set, bucket.slice);
 }
 

@@ -17,15 +17,22 @@ int test_l2_eviction(int argc, char *argv[]) {
   uintptr_t target = (uintptr_t)buffer + 4096 * 5 + 64; // Some offset
 
   printf("Target address: %p\n", (void *)target);
+  print_cache_bucket2(target);
+  printf("Target phys: %p\n",(void *)virt_to_physical(target));
+  printf("Target cacheset: %lu\n",physical_to_cacheset2(virt_to_physical(target)));
 
   for (int i = 0; i < 10; i++) {
     printf("\nIteration %d:\n", i + 1);
 
     eviction_set l2_set = {0};
-    if (populate_eviction_set_l2(&l2_set, target)) {
+    if (populate_eviction_set_l2_cheat(&l2_set, target)) {
       printf("Found L2 eviction set of size %d:\n", l2_set.length);
       for (uint32_t j = 0; j < l2_set.length; j++) {
+        uint64_t ilay = physical_to_cacheset2(virt_to_physical(l2_set.arr[j]));
         printf("  %p\n", (void *)l2_set.arr[j]);
+        print_cache_bucket2(l2_set.arr[j]);
+        printf(" and the phisical is %p\n", (void *)virt_to_physical(l2_set.arr[j]));
+        printf(" and the CACHESET is %lu\n", ilay);
       }
 
       // Verify size matches L2 associativity

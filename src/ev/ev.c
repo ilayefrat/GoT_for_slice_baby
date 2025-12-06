@@ -3,8 +3,8 @@
 #include "consts.h"
 #include "util.h"
 
-#define INITIAL_SAMPLE_SIZE (3000)
-#define ALLOCATION_SIZE (4096 * PAGE_SIZE)
+#define INITIAL_SAMPLE_SIZE (3000)//192
+#define ALLOCATION_SIZE (4096 * PAGE_SIZE)//256
 
 void *eviction_set_memory = NULL;
 
@@ -77,6 +77,49 @@ bool populate_eviction_set_l2(eviction_set *l2_eviction_set,
   }
   return false;
 }
+
+bool l2_cheat(uintptr_t evicter, uintptr_t evictee) {
+      if (physical_to_cacheset2(virt_to_physical((uint64_t)evicter)) ==
+          physical_to_cacheset2(virt_to_physical((uint64_t)evictee))) {
+        return true;
+      }
+      return false;
+}
+bool populate_eviction_set_l2_cheat(eviction_set * l2_eviction_set,
+                                        uintptr_t evictee) {
+      node_array candidates = {0};
+      if (eviction_set_memory == NULL) {
+        initialize_allocation(&eviction_set_memory, ALLOCATION_SIZE);
+      }
+
+      int page_offset = evictee & (PAGE_SIZE - 1) & ~(CACHE_LINE_SIZE - 1);
+
+      initialize_candidates(&candidates, page_offset);
+      // No shuffle needed for cheat mode, but keeping it consistent
+      node_array_shuffle(candidates);
+
+      // We need to find L2_CACHE_ASSOCIATIVITY candidates
+      l2_eviction_set->arr = malloc(L2_CACHE_ASSOCIATIVITY * sizeof(uintptr_t));
+      l2_eviction_set->length = 0;
+      l2_eviction_set->eviction_set_page_offset = page_offset;
+
+      for (int i = 0; i < candidates.length; i++) {
+        if (l2_cheat((uintptr_t)candidates.arr[i], evictee)) {
+          l2_eviction_set->arr[l2_eviction_set->length++] =
+              (uintptr_t)candidates.arr[i];
+          if (l2_eviction_set->length == L2_CACHE_ASSOCIATIVITY) {
+            free(candidates.arr);
+            return true;
+          }
+        }
+      }
+
+      free(candidates.arr);
+      free(l2_eviction_set->arr);
+      l2_eviction_set->arr = NULL;
+      l2_eviction_set->length = 0;
+      return false;
+    }
 
 bool compare_buckets(cache_bucket first, cache_bucket second) {
     return (first.cache_set == second.cache_set) && (first.slice == second.slice);

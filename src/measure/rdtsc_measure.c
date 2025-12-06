@@ -1,8 +1,9 @@
 #include "measure/measure_common.h"
 #include "util.h"
+#include <immintrin.h>
 
 #define RDTSC_THRESHOLD (180)
-#define RDTSC_THRESHOLD_L2 (35)
+#define RDTSC_THRESHOLD_L2 (80)
 
 uint64_t rdtsc_measure(uintptr_t candidate, uintptr_t trash) {
     uint64_t start = rdtsc();
@@ -31,6 +32,5 @@ bool __attribute__ ((noinline)) rdtsc_is_in_cache(uint64_t result) {
 
 bool __attribute__ ((noinline)) rdtsc_probe(node *set, uintptr_t candidate, bool is_l2) {
 	rdtsc_measure_metadata.threshold = is_l2 ? RDTSC_THRESHOLD_L2 : RDTSC_THRESHOLD;
-	printf("ilay %ld \n", rdtsc_measure_metadata.threshold);
     return common_probe(set, candidate, rdtsc_measure_metadata);
 }

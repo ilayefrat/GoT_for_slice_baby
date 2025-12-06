@@ -40,28 +40,28 @@ bool reduce_eviction_set_rec(node *sentinel, uint32_t length, uintptr_t evictee,
         // TODO: allow specifying a different probe function.
 	bool l2 = target_size == L2_CACHE_ASSOCIATIVITY;
         if (rdtsc_measure_metadata.probe(sentinel->next, evictee, l2)) {
-            //#ifdef REDUCE_DBG
+            #ifdef REDUCE_DBG
             printf("Going in with %d at idx %d\n", length - advance, i);
-            //#endif
+            #endif
             if (reduce_eviction_set_rec(sentinel, length - advance, evictee, target_size))
                 return true;
             if (backtrack_count >= BACKTRACKING_MAXIMUM) {
                 return false;
             }
         }
-        //#ifdef REDUCE_DBG
+        #ifdef REDUCE_DBG
         else {
             printf("Not going in..\n");
         }
-        //#endif
+        #endif
         node_link_chain(link_point, chain_start, chain_end);
     }
     backtrack_count++;
-    //#ifdef REDUCE_DBG
+    #ifdef REDUCE_DBG
     printf("backtracking... %d\n", backtrack_count);
     if (backtrack_count == BACKTRACKING_MAXIMUM) {
         printf("Reached max with size %d\n", length);
     }
-    //#endif
+    #endif
     return false;
 }
